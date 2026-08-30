@@ -1,4 +1,4 @@
-// COMP 2450 — Floor 1 starter
+                                                        // COMP 2450 — Floor 1 starter
 // bestiary/Search.cpp — YOU implement this file.
 //
 // Four functions to write. Read Search.h for their contracts.
@@ -65,6 +65,21 @@ const Monster* binarySearch(const std::vector<Monster>& bestiary,
     //   - Middle index: `(low + high) / 2` is textbook but can overflow for
     //     huge N. `low + (high - low) / 2` is the safe version. Write the
     //     safe one — it's free, and it's a habit worth building.
+
+    int high = static_cast<int>(bestiary.size())-1;
+    int low = 0;
+    while(low <= high){
+        int mid = low + (high-low) / 2;
+        if (bestiary[mid].name == name){
+            return &bestiary[mid];
+        }
+        else if (bestiary[mid].name < name){
+        low = mid + 1;}
+        else {
+        high = mid - 1;
+    }
+    }
+
     (void)bestiary;
     (void)name;
     return nullptr;
