@@ -12,7 +12,7 @@ Open Claude (or your LLM of choice) and paste **this exact prompt**:
 
 > *Write a C++ function template that returns the largest element of a `std::vector<T>`. Handle the case where the vector is empty. Briefly explain your design choices.*
 
-Tell us which tool you used and the date:
+Tell us which tool you used and the date: chatGPT 9/17/26
 
 - **Tool:** (e.g., Claude / ChatGPT / Copilot Chat / …)
 - **Date of the conversation:** YYYY-MM-DD
@@ -24,7 +24,25 @@ Tell us which tool you used and the date:
 Paste the **full reply**, code and prose. Use a fenced code block for the code. Do not edit the reply — we want to see what you actually got.
 
 ```cpp
-// (paste the LLM's code here)
+#include <vector>
+#include <stdexcept>
+
+template <typename T>
+T findLargest(const std::vector<T>& values) {
+    if (values.empty()) {
+        throw std::out_of_range("Vector is empty");
+    }
+
+    T largest = values[0];
+
+    for (size_t i = 1; i < values.size(); ++i) {
+        if (values[i] > largest) {
+            largest = values[i];
+        }
+    }
+
+    return largest;
+}
 ```
 
 (paste any prose explanation here, verbatim)
@@ -45,3 +63,4 @@ Address each of these:
 - **One concrete improvement.** Name one specific change you would make before merging this into a real project. Not "make it better" — a concrete code change.
 
 (your critique — at least 150 words)
+I did not actually try to compile and run the code. Due to having a mac I lowkey have no clue how to create another space where I can go and try out different codes and then get back to here... the empty-vector case checks values.empty. I think I would choose it because I think it would work good with a try/catch block. it requires T to support the comparison operator. I believe the code would just not compile if I used a struct. Passed by reference, returned by value. I think I like that and would keep it the same. It wrote the loop manually. I would probably use std:max_element because it clearly states it's goal is to find the maximum element and the loop is still valif and useful. After throughly looking through the code, nothing stands out to me to change/fix, because it is all stuff that I am familiar with and so it would probably be super close to how I'd write the code myself.

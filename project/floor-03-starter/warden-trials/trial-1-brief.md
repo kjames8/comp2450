@@ -12,7 +12,7 @@ AI is welcome to *check* your answers; it is not welcome to *write your sentence
 
 > Your battle's "Use item" menu shows the *currently usable* items in your hero's inventory on this turn. Name the right ADT for that menu. Defend the choice against its closest neighbour (e.g., why `bag` instead of `set`, or `list` instead of `bag`).
 
-(your answer — 50–100 words)
+I think that a list is the right answer. I would say list because with a bag you can't pull from a certain order because it's ransomized, meaning you can't call the same thing over, and with a set you can only pull or take away from the top. Therefore, a list is the correct answer.
 
 ---
 
@@ -20,7 +20,7 @@ AI is welcome to *check* your answers; it is not welcome to *write your sentence
 
 > Your inventory is kept sorted by healing power (in this codebase an item's `value` measures its potency, so `value` plays the healing-power role). The player types `use Healing potion`. Linear or binary search to find it by name? Justify, and give the Big-O for each.
 
-(your answer — 50–100 words)
+You would use linear search. You would use linear over binary because they are sorted by value, not by name so you wouldn't know if one is above or below the box you opened.
 
 ---
 
@@ -38,7 +38,7 @@ auto byValue  = /* your lambda */;
 auto byWeight = /* your lambda */;
 ```
 
-(one-sentence answer — what language feature?)
+auto comp = [](const Item& a, cont Item& b) {return a.value < b.value;};
 
 ---
 
@@ -46,4 +46,4 @@ auto byWeight = /* your lambda */;
 
 > Why does `Bag<T>` live in `Bag.h` instead of `Bag.cpp`? And: when the player types `9` for a 4-option menu, where in your code should the validation **throw**, and where should it **catch**?
 
-(your answer — 50–100 words)
+Bag<T> lives in Bag.h because Bag.h holds all of the "beefy" stuff, while Bag.cpp is where everything is called. .h and .cpp are seperate because then you can compile in .h whereas you can call in .cpp and it's easier to read.
