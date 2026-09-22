@@ -58,7 +58,7 @@ void printHelp() {
               << "   quit                          — leave the dungeon)\n";
 }
 
-}  // anonymous namespace
+} // anonymous namespace
 
 int main() {
     std::cout << "\n=== THE FORGEMASTER'S VAULT ===\n\n";
@@ -106,6 +106,7 @@ int main() {
         std::cout << "> ";
         if (!std::getline(std::cin, line)) break;
         if (line.empty()) continue;
+        try{
 
         std::string cmd, rest;
         splitFirst(line, cmd, rest);
@@ -133,9 +134,16 @@ int main() {
             }
             // TODO Floor 3 (Mon): wire this to findByName<T>. For now
             // it still calls Floor 1's monster-only findMonster.
-            const Monster* m = findMonster(bestiary, rest);
+            const Monster* m = findByName(bestiary, rest);
             if (m) { printMonster(*m); continue; }
-            std::cout << "No such creature stalks this Keep.\n";
+            const Item* it = findByName(hero.inventory, rest);
+            if (it) {
+                std::cout << "  " << it->name
+                          << "  (wt " << it->weight
+                          << ", val " << it->value << ")\n";
+                continue;
+            }
+            std::cout << "No such creature / item stalks this keep.\n";
         }
         else if (cmd == "inventory") {
             printInventory(hero);
@@ -168,7 +176,7 @@ int main() {
             // to `hero.inventory.at(n - 1)`. With the try/catch above,
             // the bad input becomes a clean error message instead of
             // a crash.
-            const Item& it = hero.inventory[n - 1];
+            const Item& it = hero.inventory.at(n - 1);
             std::cout << "  " << it.name
                       << "  (wt " << it.weight
                       << ", val " << it.value << ")\n";
@@ -229,6 +237,9 @@ int main() {
             std::cout << "The Vault does not understand '" << cmd << "'.\n";
         }
     }
-
+    catch(const std::exception& e){
+        std::cout << "No such item. (" << e.what() << ")\n";
+    }
+    }
     return 0;
 }

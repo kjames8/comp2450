@@ -1,14 +1,15 @@
 
 
 #include "Sort.h"
-#include <algorithm>  // you will want std::sort in sortInventory
+#include <algorithm> 
+#include <sstream> // you will want std::sort in sortInventory
 
 
 
 namespace dungeon {
 namespace {
 
-void merge(std::vector<Item>& v, std::size_t low, std::size_t mid, std::size_t high) {
+void merge(std::vector<Item>& v, std::size_t low, std::size_t mid, std::size_t high, const Comparator& cmp){
     //[low, mid)
     //[mid, high)
     std::vector<Item> scratch;
@@ -20,21 +21,84 @@ void merge(std::vector<Item>& v, std::size_t low, std::size_t mid, std::size_t h
     std::size_t j = mid; //walk the right half
 
     while (i < mid && j < high) {
-        if (!cmp(v[j], v[i])); {
-            scratch.push_back(v[i++);
+        if (!cmp(v[j], v[i])) {
+            scratch.push_back(v[i++]);
         } else {
             scratch.push_back(v[j++]);
+         }
+    }
+        //one half is drained but the other still has items
+while (i < mid) scratch.push_back(v[i++]);
+while (j < high) scratch.push_back(v[j++]);
+
+//copy the nerged result back into the v at positions [low, high)
+for (std::size_t k = 0; k < scratch.size(); ++k){
+    v[low + k] = std::move(scratch[k]);
+}
+}
+    
+void mergeSortImpl(std::vector<Item>& v, std::size_t low, std::size_t high, const Comparator& cmp) {
+if (high - low < 2) return;
+//recursion!
+std::size_t mid = low + (high - low) / 2;
+mergeSortImpl(v, low, mid, cmp);
+mergeSortImpl(v, mid, high, cmp);
+merge(v, low, mid, high, cmp);
+}
+
+std::size_t partition(std::vector<Item>& v, std::size_t low, std::size_t high, const Comparator& cmp) {
+    // high is our last index (inclusive)
+    // 1.) pick the pivot
+    std::size_t mid = low + (high - low) / 2;
+    std::swap(v[mid], v[high]);
+    const Item pivot = v[high];
+    // comput middle index
+    // std::swap exchanges two items w/o copying the whole struct
+    // In Lomuto, assumes the pivot lives at high, so by moving our pivot there, we can follow classic Lomuto
+
+    // lomuto scan
+    std::size_t store = low;
+    for (std::size_t i = low; i < high; ++i) {
+        if (cmp(v[i], pivot)) {
+            std::swap(v[i], v[store]);
+            ++store;
         }
     }
+    std::swap(v[store], v[high]);
+    return store;
+}
 
-
-
-    // Implementation for merge function
+void quicksortImpl(std::vector<Item>& v, std::size_t low, std::size_t high, const Comparator& cmp) {
+    if (low >= high) return;
+    std::size_t p = partition(v, low, high, cmp);
+    if(p > 0) quicksortImpl(v, low, p - 1, cmp);
+    quicksortImpl(v, p + 1, high, cmp);
+}
+Comparator makeComparator(const std::string& key, bool descending){
+    Comparator cmp;
+    if (key == "name") {
+        cmp = [](const Item& a, const Item& b) { return a.name <
+    b.name; };
+        } else if (key == "weight") {
+        cmp = [](const Item& a, const Item& b) { return a.weight < b.weight; };
+    } else if (key == "value") {
+        cmp = [](const Item& a, const Item& b) { return a.value < b.value; };
+    } else {
+        return nullptr;
+        }
+        if (descending){
+            Comparator asc = cmp;
+            cmp = [asc](const Item& a, const Item& b) {
+                return asc(b, a); 
+            };
+        }
+        return cmp;
+}
 }
 // ---- 1. Merge sort ------------------------------------------------------
 
 void mergeSort(std::vector<Item>& inventory, const Comparator& cmp) {
-    
+    mergeSortImpl(inventory, 0, inventory.size(), cmp);
     (void)inventory;
     (void)cmp;
 }
@@ -42,7 +106,10 @@ void mergeSort(std::vector<Item>& inventory, const Comparator& cmp) {
 // ---- 2. Quicksort -------------------------------------------------------
 
 void quicksort(std::vector<Item>& inventory, const Comparator& cmp) {
-    
+    if (inventory.size() < 2) return;
+    quicksortImpl(inventory, 0, inventory.size() - 1, cmp);
+
+
     (void)inventory;
     (void)cmp;
 }
@@ -50,43 +117,19 @@ void quicksort(std::vector<Item>& inventory, const Comparator& cmp) {
 // ---- 3. sortInventory (the seam) ----------------------------------------
 
 bool sortInventory(Hero& hero, const std::string& criterion) {
-    // TODO Floor 2 (Fri): parse criterion, build the right comparator,
-    // dispatch to a sort.
-    //
-    // Think before you type:
-    //   - Three decisions to make: WHICH key, ASC or DESC, WHICH sort.
-    //     Don't tangle them. Parse first, then build a comparator, then
-    //     hand it to exactly one sort call.
-    //   - Building a DESCENDING comparator from an ASCENDING one: you
-    //     don't need a whole second comparator. Wrap the ascending one
-    //     and swap its arguments. (Two-line lambda. Elegant.)
-    //   - Which sort? std::sort wins on speed. Your mergeSort wins on
-    //     stability (and it's YOUR code — the instructor hand-wrote
-    //     std::sort's ancestor forty years ago and still refers to
-    //     Sedgewick). Pick one. The *choice* is the assignment.
-    //   - The "desc" case for `sort by weight`: does Iron key still come
-    //     before Loaf of bread on ties? That answer tells you whether
-    //     your chosen sort is stable — and whether stability is the
-    //     right thing for this command. (Reasonable people disagree.)
-    //
-    // If you need structural hints — parse with std::istringstream:
-    //
-    //     std::istringstream in(criterion);
-    //     std::string key, dir;
-    //     in >> key >> dir;       // dir is "" if absent
-    //
-    // Build an ascending Comparator for each key ("name", "weight",
-    // "value"). If dir == "desc", wrap it in a Comparator that swaps
-    // the arguments of the ascending one.
-    //
-    // Return false on an unknown key (main.cpp will print an error).
-    //
-    // Dispatch: for this week std::sort is the right production choice.
-    // Your mergeSort and quicksort are correct too — pick one and
-    // defend it in your commit message.
-    (void)hero;
-    (void)criterion;
-    return false;
+   std::istringstream in(criterion);
+    std::string key;
+    std::string dir;
+    in >> key >> dir;
+    
+    
+    bool descending = (dir == "desc");
+    Comparator cmp = makeComparator(key, descending);
+    if(!cmp) return false;
+    std::sort(hero.inventory.begin(), hero.inventory.end(), cmp);
+    return true;
 }
 
-}  // namespace dungeon
+}
+
+
