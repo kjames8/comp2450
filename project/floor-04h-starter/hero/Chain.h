@@ -121,8 +121,10 @@ public:
     //
     // Leaving this empty means a copy of a chain is silently empty.
     // The `clone hero` command will demonstrate the bug.
-    Chain(const Chain& /*other*/) {
-        // TODO Wednesday — deep copy.
+    Chain(const Chain& other) {
+        for(const Node* p = other.head_; p != nullptr; p = p->next) {
+            push_back(p->data);
+        }
     }
 
     // TODO Floor 4½ (Friday) — implement copy assignment.
@@ -174,8 +176,8 @@ public:
 
     // TODO Floor 4½ (Monday) — return tail_.
     // Used by `log --oldest`, which walks the chain backward via prev.
-    const Node* tail() const { return nullptr; /* TODO Monday */ }
-    Node*       tail()       { return nullptr; /* TODO Monday */ }
+    const Node* tail() const { return nullptr; return tail_; }
+    Node*       tail()       { return nullptr; return tail_; }
 
     // -----------------------------------------------------------------
     // Mutation — Floor 4's push_front kept, with a Floor 4½ extension.
@@ -198,9 +200,10 @@ public:
     // -----------------------------------------------------------------
     void push_front(const T& value) {
         Node* n = new Node(value, nullptr, head_);
-        // TODO Monday — wire prev/tail consistency (see comment above).
+        if (head_ != nullptr) head_ ->prev = n; //old head links back
+        else tail_ = n; //chain was empty; n is also the tail
         head_ = n;
-        ++size_;
+        ++size;
     }
 
     // TODO Floor 4½ (Monday) — append `value` at the tail. O(1) thanks
@@ -212,7 +215,11 @@ public:
     //     tail_ = n;
     //     ++size_;
     void push_back(const T& /*value*/) {
-        // TODO Monday
+        Node* n = new Node(value, tail_, nullptr);
+        if (tail_ != nullptr) tail_->next = n;
+        else head_ = n;
+        tail_ = n;
+        ++size_;
     }
 
     // TODO Floor 4½ (Friday) — remove the front node. O(1).
