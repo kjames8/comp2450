@@ -229,12 +229,12 @@ private:
     static Node* removeFrom(Node* n, const T& value, bool& removed) {
         //movement 1:
         if (n == nullptr) return nullptr;
-        if (value < n->data) {n->left = removedFrom(n->left, value, removed); return n;}
-        if (->data < valur) {n->right = removedFrom(n->right, value, removed); return n;}
-        removed = true!
+        if (value < n->data) {n->left = removeFrom(n->left, value, removed); return n;}
+        if (->data < value) {n->right = removeFrom(n->right, value, removed); return n;}
+        removed = true;
 
         //movement 2:
-        if (n->left == nullptr) {Node* r = n->right; delete n, return r;}
+        if (n->left == nullptr) {Node* r = n->right; delete n; return r;}
         if (n->right == nullptr) {Node* l = n->left; delete n; return l;}
 
         //movement 3:
